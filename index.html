@@ -1,0 +1,1089 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Acompanhamento Médico — Neusa</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #F7F5F0;
+    --card: #FFFFFF;
+    --accent: #3B7A6B;
+    --accent-light: #E8F2EF;
+    --accent-dark: #2C5C50;
+    --warm: #D4A574;
+    --warm-light: #FFF5EC;
+    --text: #2D2D2D;
+    --text-light: #6B6B6B;
+    --border: #E8E4DD;
+    --danger: #C2544D;
+    --danger-light: #FDF0EF;
+    --pending: #D4A030;
+    --pending-light: #FFF8E7;
+    --success: #3B7A6B;
+    --success-light: #E8F2EF;
+    --shadow: 0 2px 16px rgba(0,0,0,0.06);
+    --shadow-hover: 0 4px 24px rgba(0,0,0,0.1);
+    --radius: 16px;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.7;
+    min-height: 100vh;
+  }
+
+  /* Header */
+  .header {
+    background: linear-gradient(135deg, var(--accent-dark) 0%, var(--accent) 60%, #4A9A87 100%);
+    padding: 40px 24px 48px;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .header::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(circle at 30% 50%, rgba(255,255,255,0.08) 0%, transparent 50%);
+    animation: shimmer 8s ease-in-out infinite;
+  }
+
+  @keyframes shimmer {
+    0%, 100% { transform: translate(0, 0); }
+    50% { transform: translate(5%, 3%); }
+  }
+
+  .header h1 {
+    font-family: 'DM Serif Display', serif;
+    color: #fff;
+    font-size: 2rem;
+    font-weight: 400;
+    position: relative;
+    letter-spacing: 0.5px;
+  }
+
+  .header p {
+    color: rgba(255,255,255,0.8);
+    font-size: 0.95rem;
+    margin-top: 8px;
+    position: relative;
+    font-weight: 300;
+  }
+
+  .header .patient-info {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: rgba(255,255,255,0.15);
+    backdrop-filter: blur(10px);
+    padding: 8px 20px;
+    border-radius: 100px;
+    margin-top: 16px;
+    position: relative;
+    font-size: 0.9rem;
+    color: rgba(255,255,255,0.95);
+  }
+
+  /* Navigation */
+  .nav-container {
+    display: flex;
+    justify-content: center;
+    gap: 12px;
+    padding: 24px;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    background: var(--bg);
+    border-bottom: 1px solid var(--border);
+  }
+
+  .nav-btn {
+    padding: 14px 28px;
+    border: 2px solid var(--border);
+    background: var(--card);
+    border-radius: 100px;
+    cursor: pointer;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: var(--text-light);
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .nav-btn:hover {
+    border-color: var(--accent);
+    color: var(--accent);
+    transform: translateY(-1px);
+    box-shadow: var(--shadow);
+  }
+
+  .nav-btn.active {
+    background: var(--accent);
+    color: #fff;
+    border-color: var(--accent);
+    box-shadow: 0 4px 16px rgba(59,122,107,0.3);
+  }
+
+  .nav-btn .icon { font-size: 1.2rem; }
+
+  /* Main content */
+  .content { max-width: 900px; margin: 0 auto; padding: 32px 24px 80px; }
+
+  .section { display: none; }
+  .section.active { display: block; animation: fadeIn 0.4s ease; }
+
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(12px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  /* Summary section for family */
+  .family-summary {
+    background: var(--card);
+    border-radius: var(--radius);
+    padding: 36px;
+    box-shadow: var(--shadow);
+    margin-bottom: 28px;
+  }
+
+  .family-summary h2 {
+    font-family: 'DM Serif Display', serif;
+    font-size: 1.5rem;
+    color: var(--accent-dark);
+    margin-bottom: 24px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .summary-block {
+    padding: 20px 24px;
+    border-radius: 12px;
+    margin-bottom: 16px;
+  }
+
+  .summary-block:last-child { margin-bottom: 0; }
+
+  .summary-block h3 {
+    font-size: 1rem;
+    font-weight: 700;
+    margin-bottom: 8px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .summary-block p {
+    font-size: 0.93rem;
+    color: var(--text);
+    line-height: 1.8;
+  }
+
+  .block-diagnosis {
+    background: linear-gradient(135deg, #FDF0EF 0%, #FFF5F5 100%);
+    border-left: 4px solid var(--danger);
+  }
+  .block-diagnosis h3 { color: var(--danger); }
+
+  .block-status {
+    background: linear-gradient(135deg, var(--accent-light) 0%, #F0F8F5 100%);
+    border-left: 4px solid var(--accent);
+  }
+  .block-status h3 { color: var(--accent-dark); }
+
+  .block-pending {
+    background: linear-gradient(135deg, var(--pending-light) 0%, #FFFCF0 100%);
+    border-left: 4px solid var(--pending);
+  }
+  .block-pending h3 { color: #9A7A20; }
+
+  .block-next {
+    background: linear-gradient(135deg, #EDE8F5 0%, #F5F0FF 100%);
+    border-left: 4px solid #7C5CBF;
+  }
+  .block-next h3 { color: #5A3D9E; }
+
+  /* Exam cards */
+  .exam-card {
+    background: var(--card);
+    border-radius: var(--radius);
+    padding: 28px 32px;
+    box-shadow: var(--shadow);
+    margin-bottom: 16px;
+    border-left: 4px solid var(--accent);
+    cursor: pointer;
+    transition: all 0.3s ease;
+    position: relative;
+  }
+
+  .exam-card:hover {
+    box-shadow: var(--shadow-hover);
+    transform: translateY(-2px);
+  }
+
+  .exam-card .card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .exam-card .exam-title {
+    font-family: 'DM Serif Display', serif;
+    font-size: 1.15rem;
+    color: var(--text);
+  }
+
+  .exam-card .exam-date {
+    font-size: 0.82rem;
+    color: var(--text-light);
+    background: var(--bg);
+    padding: 4px 14px;
+    border-radius: 100px;
+    white-space: nowrap;
+    font-weight: 500;
+  }
+
+  .exam-card .exam-source {
+    font-size: 0.82rem;
+    color: var(--text-light);
+    margin-top: 4px;
+  }
+
+  .exam-card .exam-details {
+    display: none;
+    margin-top: 20px;
+    padding-top: 20px;
+    border-top: 1px solid var(--border);
+    font-size: 0.92rem;
+    color: var(--text);
+    line-height: 1.9;
+  }
+
+  .exam-card .exam-details.open { display: block; animation: fadeIn 0.3s ease; }
+
+  .exam-card .expand-hint {
+    font-size: 0.8rem;
+    color: var(--accent);
+    margin-top: 10px;
+    font-weight: 500;
+  }
+
+  .exam-card .badge {
+    display: inline-block;
+    padding: 3px 12px;
+    border-radius: 100px;
+    font-size: 0.78rem;
+    font-weight: 600;
+    margin-top: 8px;
+  }
+
+  .badge-alert {
+    background: var(--danger-light);
+    color: var(--danger);
+  }
+
+  .badge-ok {
+    background: var(--success-light);
+    color: var(--success);
+  }
+
+  .badge-pending {
+    background: var(--pending-light);
+    color: var(--pending);
+  }
+
+  .section-title {
+    font-family: 'DM Serif Display', serif;
+    font-size: 1.3rem;
+    color: var(--accent-dark);
+    margin: 36px 0 20px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .section-title:first-child { margin-top: 0; }
+
+  /* Appointments section */
+  .appointment-list { margin-bottom: 32px; }
+
+  .appointment-item {
+    background: var(--card);
+    border-radius: var(--radius);
+    padding: 20px 28px;
+    box-shadow: var(--shadow);
+    margin-bottom: 12px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    transition: all 0.3s ease;
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+
+  .appointment-item:hover { box-shadow: var(--shadow-hover); }
+
+  .appointment-item .appt-info { flex: 1; min-width: 200px; }
+  .appointment-item .appt-title { font-weight: 600; font-size: 1rem; }
+  .appointment-item .appt-detail { font-size: 0.85rem; color: var(--text-light); margin-top: 2px; }
+  .appointment-item .appt-date {
+    font-weight: 600;
+    color: var(--accent-dark);
+    font-size: 0.95rem;
+    white-space: nowrap;
+  }
+
+  .delete-btn {
+    background: none;
+    border: none;
+    color: var(--text-light);
+    cursor: pointer;
+    font-size: 1.2rem;
+    padding: 4px 8px;
+    border-radius: 8px;
+    transition: all 0.2s ease;
+  }
+
+  .delete-btn:hover { color: var(--danger); background: var(--danger-light); }
+
+  /* Form */
+  .add-form {
+    background: var(--card);
+    border-radius: var(--radius);
+    padding: 32px;
+    box-shadow: var(--shadow);
+  }
+
+  .add-form h3 {
+    font-family: 'DM Serif Display', serif;
+    font-size: 1.2rem;
+    color: var(--accent-dark);
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    margin-bottom: 16px;
+  }
+
+  .form-group { display: flex; flex-direction: column; gap: 6px; }
+
+  .form-group label {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--text-light);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+
+  .form-group input,
+  .form-group select,
+  .form-group textarea {
+    padding: 12px 16px;
+    border: 2px solid var(--border);
+    border-radius: 12px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.95rem;
+    color: var(--text);
+    background: var(--bg);
+    transition: border-color 0.2s ease;
+    outline: none;
+  }
+
+  .form-group input:focus,
+  .form-group select:focus,
+  .form-group textarea:focus {
+    border-color: var(--accent);
+  }
+
+  .form-group textarea { resize: vertical; min-height: 80px; }
+
+  .submit-btn {
+    width: 100%;
+    padding: 16px;
+    background: var(--accent);
+    color: #fff;
+    border: none;
+    border-radius: 12px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    margin-top: 8px;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+  }
+
+  .submit-btn:hover { background: var(--accent-dark); transform: translateY(-1px); box-shadow: 0 4px 16px rgba(59,122,107,0.3); }
+
+  .empty-state {
+    text-align: center;
+    padding: 48px 24px;
+    color: var(--text-light);
+  }
+
+  .empty-state .icon { font-size: 3rem; margin-bottom: 12px; }
+  .empty-state p { font-size: 0.95rem; }
+
+  .timeline-line {
+    position: relative;
+    padding-left: 24px;
+  }
+
+  .timeline-line::before {
+    content: '';
+    position: absolute;
+    left: 7px;
+    top: 0;
+    bottom: 0;
+    width: 2px;
+    background: var(--border);
+  }
+
+  .timeline-line .exam-card { position: relative; }
+
+  .timeline-line .exam-card::before {
+    content: '';
+    position: absolute;
+    left: -21px;
+    top: 32px;
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background: var(--accent);
+    border: 3px solid var(--accent-light);
+  }
+
+  /* Responsive */
+  @media (max-width: 640px) {
+    .nav-container { padding: 16px; gap: 8px; }
+    .nav-btn { padding: 12px 18px; font-size: 0.85rem; }
+    .family-summary { padding: 24px; }
+    .summary-block { padding: 16px 18px; }
+    .exam-card { padding: 20px 22px; }
+    .form-row { grid-template-columns: 1fr; }
+    .content { padding: 24px 16px 80px; }
+    .header h1 { font-size: 1.5rem; }
+    .add-form { padding: 24px; }
+  }
+
+  .highlight { font-weight: 600; color: var(--danger); }
+  .highlight-ok { font-weight: 600; color: var(--accent-dark); }
+
+  .last-updated {
+    text-align: center;
+    font-size: 0.8rem;
+    color: var(--text-light);
+    padding: 24px;
+    border-top: 1px solid var(--border);
+    margin-top: 40px;
+  }
+
+  /* Password screen */
+  .password-overlay {
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: linear-gradient(135deg, var(--accent-dark) 0%, var(--accent) 60%, #4A9A87 100%);
+    z-index: 9999;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+  }
+
+  .password-overlay.hidden { display: none; }
+
+  .password-box {
+    background: var(--card);
+    border-radius: var(--radius);
+    padding: 48px 40px;
+    box-shadow: 0 8px 40px rgba(0,0,0,0.15);
+    text-align: center;
+    max-width: 400px;
+    width: 90%;
+    animation: fadeIn 0.5s ease;
+  }
+
+  .password-box .lock-icon { font-size: 3rem; margin-bottom: 16px; }
+
+  .password-box h2 {
+    font-family: 'DM Serif Display', serif;
+    font-size: 1.4rem;
+    color: var(--text);
+    margin-bottom: 8px;
+  }
+
+  .password-box p {
+    font-size: 0.9rem;
+    color: var(--text-light);
+    margin-bottom: 24px;
+  }
+
+  .password-box input {
+    width: 100%;
+    padding: 14px 18px;
+    border: 2px solid var(--border);
+    border-radius: 12px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 1.1rem;
+    text-align: center;
+    letter-spacing: 8px;
+    color: var(--text);
+    background: var(--bg);
+    outline: none;
+    transition: border-color 0.2s ease;
+  }
+
+  .password-box input:focus { border-color: var(--accent); }
+
+  .password-box .pw-btn {
+    width: 100%;
+    padding: 14px;
+    background: var(--accent);
+    color: #fff;
+    border: none;
+    border-radius: 12px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    margin-top: 16px;
+    transition: all 0.3s ease;
+  }
+
+  .password-box .pw-btn:hover { background: var(--accent-dark); }
+
+  .password-box .pw-error {
+    color: var(--danger);
+    font-size: 0.85rem;
+    margin-top: 12px;
+    display: none;
+  }
+
+  .main-app { display: none; }
+  .main-app.visible { display: block; }
+</style>
+</head>
+<body>
+
+<!-- PASSWORD SCREEN -->
+<div class="password-overlay" id="password-overlay">
+  <div class="password-box">
+    <div class="lock-icon">🔒</div>
+    <h2>Área Protegida</h2>
+    <p>Digite a senha para acessar o painel</p>
+    <input type="password" id="pw-input" maxlength="10" placeholder="••••" onkeydown="if(event.key==='Enter') checkPassword()">
+    <button class="pw-btn" onclick="checkPassword()">Entrar</button>
+    <div class="pw-error" id="pw-error">Senha incorreta. Tente novamente.</div>
+  </div>
+</div>
+
+<script>
+function checkPassword() {
+  const input = document.getElementById('pw-input').value;
+  if (input === '5582') {
+    document.getElementById('password-overlay').classList.add('hidden');
+    document.getElementById('main-app').classList.add('visible');
+  } else {
+    document.getElementById('pw-error').style.display = 'block';
+    document.getElementById('pw-input').value = '';
+    document.getElementById('pw-input').focus();
+  }
+}
+</script>
+
+<!-- MAIN APP -->
+<div class="main-app" id="main-app">
+
+<div class="header">
+  <h1>Acompanhamento Médico</h1>
+  <p>Painel de saúde da família</p>
+  <div class="patient-info">
+    <span>👩‍🦳</span>
+    <span>Neusa · 70 anos</span>
+  </div>
+</div>
+
+<div class="nav-container">
+  <button class="nav-btn active" onclick="showSection('status')">
+    <span class="icon">📋</span>
+    Status dos Exames
+  </button>
+  <button class="nav-btn" onclick="showSection('agenda')">
+    <span class="icon">📅</span>
+    Próximos Agendamentos
+  </button>
+</div>
+
+<div class="content">
+
+  <!-- STATUS DOS EXAMES -->
+  <div id="status" class="section active">
+
+    <!-- RESUMO PARA A FAMÍLIA -->
+    <div class="family-summary">
+      <h2>💚 Resumo para a Família</h2>
+
+      <div class="summary-block block-diagnosis">
+        <h3>🔬 O Diagnóstico</h3>
+        <p>
+          A paciente foi diagnosticada com um <span class="highlight">carcinoma ductal invasivo na mama direita</span>. 
+          Esse é o tipo mais comum de câncer de mama. O tumor está localizado na posição de 9 horas da mama direita e mede 
+          aproximadamente 2,3 cm. Os exames mostraram que o tumor é <strong>receptor de estrógeno positivo (RE+)</strong> 
+          e <strong>receptor de progesterona positivo (RP+)</strong>, o que é uma informação importante porque tumores com 
+          essas características geralmente respondem bem à terapia hormonal. O resultado do HER2 deu escore 2+ (indeterminado), 
+          e por isso ainda é necessário um exame complementar (FISH) para confirmar se é positivo ou negativo — isso vai 
+          influenciar no tipo de tratamento.
+        </p>
+        <p style="margin-top: 12px;">
+          Na <strong>mama esquerda</strong>, a biópsia mostrou <span class="highlight-ok">alterações benignas</span> — 
+          uma hiperplasia ductal usual, que <strong>não é câncer</strong>. São alterações fibrocísticas e proliferativas 
+          comuns que não necessitam de tratamento agressivo.
+        </p>
+      </div>
+
+      <div class="summary-block block-status">
+        <h3>✅ O Que Já Foi Feito</h3>
+        <p>
+          Desde novembro de 2025, a paciente realizou uma série completa de exames de imagem e biópsias. 
+          A mamografia e ultrassonografia identificaram o nódulo suspeito. Foram feitas duas biópsias — uma na mama direita 
+          (core biopsy guiada por ultrassom) e uma na mama esquerda (mamotomia guiada por estereotaxia). 
+          Os materiais foram analisados por anatomopatologia e imuno-histoquímica, confirmando o diagnóstico. 
+          A ressonância magnética mapeou a extensão completa do tumor. 
+          A tomografia de abdome e pelve (feita em fevereiro/2026) <span class="highlight-ok">não mostrou alterações</span>, 
+          o que é um bom sinal indicando que não há sinais de doença no abdome e pelve.
+        </p>
+      </div>
+
+      <div class="summary-block block-pending">
+        <h3>⏳ Exames Que Ainda Faltam</h3>
+        <p>
+          <strong>1. Exame FISH/SISH (HER2):</strong> O resultado imuno-histoquímico do HER2 deu escore 2+, 
+          que é considerado indeterminado. É necessário realizar o exame FISH (ou SISH) no material já coletado da biópsia 
+          para determinar se há amplificação do gene HER2. Essa informação é fundamental para definir se a quimioterapia 
+          incluirá medicamentos específicos anti-HER2 (como trastuzumab). 
+        </p>
+        <p style="margin-top: 10px;">
+          <strong>2. Cintilografia Óssea:</strong> Exame de imagem para verificar se há algum comprometimento nos ossos. 
+          É um exame de estadiamento — ajuda a equipe médica a entender a extensão da doença e planejar o tratamento 
+          da melhor forma.
+        </p>
+      </div>
+
+      <div class="summary-block block-next">
+        <h3>🩺 Próximos Passos</h3>
+        <p>
+          A paciente vai <strong>iniciar as sessões de quimioterapia na próxima semana</strong>. 
+          A quimioterapia neoadjuvante (antes da cirurgia) é um caminho comum nesses casos — o objetivo é reduzir 
+          o tumor antes de uma eventual cirurgia, além de tratar possíveis células que possam ter se espalhado. 
+          O esquema exato de quimioterapia será definido pela oncologista, levando em conta o perfil do tumor (RE+, RP+) 
+          e o resultado pendente do FISH/HER2.
+        </p>
+      </div>
+    </div>
+
+    <!-- LINHA DO TEMPO DOS EXAMES -->
+    <h3 class="section-title">📄 Detalhes dos Exames Realizados</h3>
+    <p style="font-size: 0.88rem; color: var(--text-light); margin-bottom: 20px;">Clique em cada exame para ver os detalhes técnicos completos.</p>
+
+    <div class="timeline-line">
+
+      <!-- 1. Mamografia -->
+      <div class="exam-card" onclick="toggleDetails(this)">
+        <div class="card-header">
+          <div>
+            <div class="exam-title">Mamografia Digital</div>
+            <div class="exam-source">FEMME Laboratório da Mulher · Dra. Simone M. Okimasu</div>
+            <span class="badge badge-alert">BI-RADS 5 — Altamente Suspeito</span>
+          </div>
+          <span class="exam-date">26/11/2025</span>
+        </div>
+        <div class="expand-hint">▸ Clique para ver detalhes</div>
+        <div class="exam-details">
+          <p><strong>Indicação:</strong> Rastreamento.</p>
+          <p><strong>Achados mamográficos:</strong></p>
+          <p>Mamas com densidades fibroglandulares esparsas. Nódulo irregular e espiculado, hiperdenso, com microcalcificações pleomórficas, medindo cerca de 21 mm, localizado no terço posterior da JQI da mama direita.</p>
+          <p>Assimetria global envolvendo o quadrante superolateral da mama direita, com microcalcificações amorfas (extensão ~114 mm), adjacente ao nódulo.</p>
+          <p>Outra assimetria focal com microcalcificações amorfas (~76 mm) no terço médio e posterior do QSL da mama esquerda.</p>
+          <p><strong>Impressão diagnóstica:</strong> BI-RADS 5 (Categoria 5).</p>
+          <p><strong>Recomendações:</strong> Biópsia histológica do nódulo na mama direita (guiada por ultrassonografia). Considerar RM se resultado positivo. Biópsia da mama esquerda por mamotomia com estereotaxia.</p>
+        </div>
+      </div>
+
+      <!-- 2. Ultrassonografia -->
+      <div class="exam-card" onclick="toggleDetails(this)">
+        <div class="card-header">
+          <div>
+            <div class="exam-title">Ultrassonografia Mamária</div>
+            <div class="exam-source">FEMME Laboratório da Mulher · Dra. Simone M. Okimasu</div>
+            <span class="badge badge-alert">BI-RADS 5 — Altamente Suspeito</span>
+          </div>
+          <span class="exam-date">26/11/2025</span>
+        </div>
+        <div class="expand-hint">▸ Clique para ver detalhes</div>
+        <div class="exam-details">
+          <p><strong>Mama direita (7/8 horas):</strong> Nódulo hipoecoico irregular, espiculado, medindo 1,9 x 1,4 x 1,7 cm. Focos ecogênicos compatíveis com microcalcificações no interior. Atenuação posterior do feixe acústico.</p>
+          <p><strong>Mama esquerda (2 horas):</strong> Nódulo hipoecoico oval, circunscrito, paralelo à pele, 0,8 x 0,8 x 0,5 cm — compatível com cisto de conteúdo espesso.</p>
+          <p>Espaços retro-mamilares sem alterações. Sem linfonodomegalias axilares.</p>
+          <p><strong>Conclusão:</strong> Nódulos bilaterais. BI-RADS 5. Sugerida biópsia da mama direita guiada por ultrassonografia.</p>
+        </div>
+      </div>
+
+      <!-- 3. Core Biopsy -->
+      <div class="exam-card" onclick="toggleDetails(this)">
+        <div class="card-header">
+          <div>
+            <div class="exam-title">Core Biopsy — Mama Direita</div>
+            <div class="exam-source">GIMI Medicina Diagnóstica · Dra. Luciana Graziano (Radiologista)</div>
+            <span class="badge badge-ok">Procedimento sem intercorrências</span>
+          </div>
+          <span class="exam-date">04/12/2025</span>
+        </div>
+        <div class="expand-hint">▸ Clique para ver detalhes</div>
+        <div class="exam-details">
+          <p><strong>Técnica:</strong> Ultrassonografia mamária com transdutor linear de alta frequência.</p>
+          <p>Anestesia local com cloridrato de lidocaína 2%. Incisão com bisturi lâmina 11.</p>
+          <p>Biópsia de fragmento por agulha grossa em nódulo hipoecoico, irregular, espiculado, palpável, localizado às 9h da mama direita, medindo 26,5 x 22 x 20 mm.</p>
+          <p>Curativo compressivo realizado. Procedimento sem intercorrências.</p>
+          <p>Material enviado para estudo anatomopatológico e imuno-histoquímico (3 fragmentos).</p>
+          <p><strong>OBS:</strong> Há correlação anátomo-radiológica.</p>
+        </div>
+      </div>
+
+      <!-- 4. Mamotomia mama esquerda -->
+      <div class="exam-card" onclick="toggleDetails(this)">
+        <div class="card-header">
+          <div>
+            <div class="exam-title">Biópsia por Mamotomia — Mama Esquerda</div>
+            <div class="exam-source">FEMME Laboratório da Mulher · Dra. Simone M. Okimasu</div>
+            <span class="badge badge-ok">Procedimento sem intercorrências</span>
+          </div>
+          <span class="exam-date">29/12/2025</span>
+        </div>
+        <div class="expand-hint">▸ Clique para ver detalhes</div>
+        <div class="exam-details">
+          <p><strong>Indicação clínica:</strong> Exame de 26/11/2025 evidenciou assimetria focal da mama esquerda.</p>
+          <p>Biópsia por agulha grossa assistida a vácuo (mamotomia) em mesa estereotáxica horizontal digital.</p>
+          <p><strong>Lesão alvo:</strong> Assimetria focal com microcalcificações associadas no terço médio do QSL da mama esquerda.</p>
+          <p>Via de acesso: incidência crânio-caudal. Colocado clipe de titânio pós-procedimento.</p>
+          <p>Paciente liberada com faixa compressiva e orientações.</p>
+          <p>Material enviado para análise histológica no setor especializado em patologia mamária do Femme.</p>
+          <p><strong>Correlação anátomo-radiológica:</strong> Há concordância entre achados radiológicos e resultado histológico. Sugerida investigação imuno-histoquímica.</p>
+        </div>
+      </div>
+
+      <!-- 5. Imuno-histoquímico Mama Direita (Diagnóstika) -->
+      <div class="exam-card" onclick="toggleDetails(this)" style="border-left-color: var(--danger);">
+        <div class="card-header">
+          <div>
+            <div class="exam-title">Imuno-histoquímico — Mama Direita</div>
+            <div class="exam-source">Diagnóstika / Grupo Pardini · Dr. Adriano de Almeida</div>
+            <span class="badge badge-alert">Carcinoma Ductal Invasivo</span>
+          </div>
+          <span class="exam-date">08–31/12/2025</span>
+        </div>
+        <div class="expand-hint">▸ Clique para ver detalhes</div>
+        <div class="exam-details">
+          <p><strong>Amostra:</strong> Core biopsy — mama direita, 9 horas.</p>
+          <p><strong>Painel de anticorpos:</strong></p>
+          <p>• HER2 (4B5): <strong>Escore 2+</strong> (indeterminado — necessário FISH/SISH)</p>
+          <p>• Ki-67 (30-9): Positivo em 40% das células</p>
+          <p>• P63 (4A4): Negativo para células mioepiteliais em áreas invasivas</p>
+          <p>• RE — Receptor de Estrógeno (SP1): <strong>Positivo em >95% das células</strong>, intensidade forte</p>
+          <p>• RP — Receptor de Progesterona (1E2): <strong>Positivo em 50% das células</strong>, intensidade moderada a forte</p>
+          <p><strong>Diagnóstico:</strong> Carcinoma invasivo sem outras especificações (Carcinoma Ductal Invasivo, SOE), positivo para RE, positivo para RP, e escore 2+ para HER2.</p>
+          <p><strong>Observação:</strong> Devido ao escore 2+ para HER2, é necessário exame de hibridização in situ (SISH ou FISH) para definir amplificação do gene HER2.</p>
+          <p style="margin-top: 12px;"><strong>Avaliação HER2 (ASCO/CAP 2023/2025):</strong> O laudo detalha a escala de escores HER2 (0 a 3+) e menciona os estudos DESTINY-Breast04 e DESTINY-Breast06 sobre trastuzumab deruxtecan (T-DXd) para pacientes HER2-low e HER2-ultralow.</p>
+        </div>
+      </div>
+
+      <!-- 6. Anatomopatológico mama esquerda -->
+      <div class="exam-card" onclick="toggleDetails(this)">
+        <div class="card-header">
+          <div>
+            <div class="exam-title">Anatomopatológico — Mama Esquerda</div>
+            <div class="exam-source">FEMME · Dr. Caio C. I. De Vasconcellos</div>
+            <span class="badge badge-ok">Alterações benignas</span>
+          </div>
+          <span class="exam-date">06/01/2026</span>
+        </div>
+        <div class="expand-hint">▸ Clique para ver detalhes</div>
+        <div class="exam-details">
+          <p><strong>Amostra:</strong> Biópsia por agulha grossa assistida a vácuo, estereotaxia — mama esquerda, QSL.</p>
+          <p><strong>Macroscopia:</strong> Fragmentos filiformes em 2 frascos ("com microcalcificações" e "sem microcalcificações"). Fixador: Formol 10%.</p>
+          <p><strong>Diagnóstico — Alterações fibrocísticas e proliferativas da mama:</strong></p>
+          <p>• Hiperplasia epitelial intraductal com esparsos focos de microcalcificações intraluminais</p>
+          <p>• Alteração de células colunares sem atipias</p>
+          <p>• Adenose acinar florida esboçando nódulo (4,0 mm)</p>
+          <p>• Metaplasia e alteração papilar apócrina</p>
+          <p>• Ectasia ductal com processo inflamatório crônico e fibrose periductal</p>
+          <p>• Fibroesclerose estromal</p>
+          <p><strong>Nota 1:</strong> Sugerido estudo imuno-histoquímico para complementação diagnóstica.</p>
+          <p><strong>Nota 2:</strong> Microcalcificações de representação focal — recomendada correlação com seguimento radiológico.</p>
+        </div>
+      </div>
+
+      <!-- 7. Imuno-histoquímico mama esquerda (FEMME) -->
+      <div class="exam-card" onclick="toggleDetails(this)">
+        <div class="card-header">
+          <div>
+            <div class="exam-title">Imuno-histoquímico — Mama Esquerda</div>
+            <div class="exam-source">FEMME · Dr. Caio C. I. De Vasconcellos</div>
+            <span class="badge badge-ok">Hiperplasia ductal usual (benigno)</span>
+          </div>
+          <span class="exam-date">13/01/2026</span>
+        </div>
+        <div class="expand-hint">▸ Clique para ver detalhes</div>
+        <div class="exam-details">
+          <p><strong>Amostra analisada:</strong> Mama esquerda (bloco de parafina AP-022500123358).</p>
+          <p><strong>Marcadores:</strong></p>
+          <p>• Receptor de Estrógeno (clone SP1): Positivo nas áreas de interesse</p>
+          <p>• CK5-6 (clone D5/16B4): Positivo em "mosaico" nas áreas de interesse</p>
+          <p><strong>Conclusão diagnóstica:</strong> O perfil imuno-histoquímico favorece o diagnóstico de <strong>Hiperplasia ductal usual</strong> nos focos de proliferação intraductal.</p>
+          <p>Demais achados do parênquima mamário confirmam alterações já descritas no anatomopatológico.</p>
+          <p><strong>Nota:</strong> Devido à focalidade da representação de microcalcificações, os diagnósticos devem ser correlacionados com dados radiológicos. Em caso de discordância, considerar reamostragem.</p>
+        </div>
+      </div>
+
+      <!-- 8. Ressonância Magnética -->
+      <div class="exam-card" onclick="toggleDetails(this)" style="border-left-color: var(--danger);">
+        <div class="card-header">
+          <div>
+            <div class="exam-title">Ressonância Magnética das Mamas</div>
+            <div class="exam-source">FEMME · Dra. Simone M. Okimasu</div>
+            <span class="badge badge-alert">BI-RADS 5 — Altamente Suspeito</span>
+          </div>
+          <span class="exam-date">29/12/2025</span>
+        </div>
+        <div class="expand-hint">▸ Clique para ver detalhes</div>
+        <div class="exam-details">
+          <p><strong>Técnica:</strong> Imagens multiplanares em T1 e T2, com agente paramagnético (Optiray/TM320 10mg), com 1, 2, 3 e 5 minutos. Sequências dinâmicas com subtração pós-contraste.</p>
+          <p><strong>Composição:</strong> Mamas constituídas por tecido fibroglandular heterogêneo com acentuado realce parenquimatoso de fundo.</p>
+          <p><strong>Achados — Mama direita:</strong> Realce não nodular com nódulos irregulares, espiculados, com realce heterogêneo e washout, na união dos quadrantes laterais. Maior nódulo mede 2,3 cm, correspondendo ao achado do ultrassom/mamografia. O conjunto dos achados mede 5,9 x 3,8 x 4,2 cm (AP x CC x LL). Dista 6,4 cm da papila, 1,6 cm da pele lateral e 2,5 cm da musculatura peitoral.</p>
+          <p><strong>Achados — Mama esquerda:</strong> Realce não nodular linear no terço posterior do quadrante superolateral (1,3 cm de extensão), correspondendo em parte às calcificações biopsiadas. Dista 12,1 cm da papila, 3,5 cm da pele lateral e 2,2 cm da musculatura peitoral.</p>
+          <p>Cistos esparsos e bilaterais, alguns com conteúdo espesso. Ectasias ductais. Linfonodos axilares com aspecto habitual. Sem linfonodomegalias em cadeias torácicas internas.</p>
+          <p><strong>Classificação BI-RADS:</strong> Categoria 5 — Achados Altamente Suspeitos.</p>
+          <p><strong>Correlação:</strong> Exame correlacionado com mamografia e ultrassonografia (11/2025), biópsia (12/2025).</p>
+        </div>
+      </div>
+
+      <!-- 9. Tomografia -->
+      <div class="exam-card" onclick="toggleDetails(this)">
+        <div class="card-header">
+          <div>
+            <div class="exam-title">Tomografia — Abdome Superior e Pelve</div>
+            <div class="exam-source">HSPM · Dra. Susy Muszkat</div>
+            <span class="badge badge-ok">Sem alterações significativas</span>
+          </div>
+          <span class="exam-date">19/02/2026</span>
+        </div>
+        <div class="expand-hint">▸ Clique para ver detalhes</div>
+        <div class="exam-details">
+          <p><strong>Técnica:</strong> Cortes tomográficos no plano axial, sem contraste endovenoso.</p>
+          <p><strong>Análise:</strong></p>
+          <p>• Fígado, baço, adrenais e pâncreas: sem alterações significativas</p>
+          <p>• Rins: situação e dimensões normais, sem dilatação das vias coletoras</p>
+          <p>• Aorta e veia cava inferior: calibre e contornos normais</p>
+          <p>• Parênquima renal: espessura normal</p>
+          <p>• Sem linfonodomegalias retroperitoneais</p>
+          <p>• Bexiga: capacidade, morfologia e situação normais</p>
+          <p>• Sem massas ou coleções na escavação pélvica</p>
+          <p>• Sem líquido livre na cavidade peritoneal</p>
+          <p><strong>Conclusão:</strong> Exame sem alterações significativas dentro do protocolo realizado.</p>
+        </div>
+      </div>
+
+    </div><!-- end timeline -->
+  </div>
+
+  <!-- AGENDAMENTOS -->
+  <div id="agenda" class="section">
+    <h3 class="section-title">📅 Próximos Agendamentos</h3>
+
+    <div id="appointment-list" class="appointment-list">
+      <div class="empty-state" id="empty-state">
+        <div class="icon">📭</div>
+        <p>Nenhum agendamento cadastrado ainda.</p>
+        <p style="font-size: 0.85rem; margin-top: 4px;">Use o formulário abaixo para adicionar.</p>
+      </div>
+    </div>
+
+    <div class="add-form">
+      <h3>➕ Novo Agendamento</h3>
+      <div class="form-row">
+        <div class="form-group">
+          <label>Tipo</label>
+          <select id="appt-type">
+            <option value="Consulta">Consulta</option>
+            <option value="Exame">Exame</option>
+            <option value="Quimioterapia">Quimioterapia</option>
+            <option value="Cirurgia">Cirurgia</option>
+            <option value="Retorno">Retorno</option>
+            <option value="Outro">Outro</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Data</label>
+          <input type="date" id="appt-date">
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>Horário</label>
+          <input type="time" id="appt-time">
+        </div>
+        <div class="form-group">
+          <label>Local / Médico</label>
+          <input type="text" id="appt-location" placeholder="Ex: HSPM, Dra. Marina...">
+        </div>
+      </div>
+      <div class="form-group" style="margin-bottom: 16px;">
+        <label>Observações</label>
+        <textarea id="appt-notes" placeholder="Detalhes adicionais, preparo necessário..."></textarea>
+      </div>
+      <button class="submit-btn" onclick="addAppointment()">
+        <span>➕</span> Adicionar Agendamento
+      </button>
+    </div>
+  </div>
+
+  <div class="last-updated">
+    Última atualização: Março 2026 · Dados extraídos dos laudos médicos originais
+  </div>
+
+</div>
+
+<script>
+  // Navigation
+  function showSection(id) {
+    document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+    document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+    document.getElementById(id).classList.add('active');
+    event.currentTarget.classList.add('active');
+  }
+
+  // Toggle exam details
+  function toggleDetails(card) {
+    const details = card.querySelector('.exam-details');
+    const hint = card.querySelector('.expand-hint');
+    if (details.classList.contains('open')) {
+      details.classList.remove('open');
+      hint.textContent = '▸ Clique para ver detalhes';
+    } else {
+      details.classList.add('open');
+      hint.textContent = '▾ Clique para fechar';
+    }
+  }
+
+  // Appointments
+  let appointments = [];
+
+  function loadAppointments() {
+    const stored = null; // no localStorage available
+    renderAppointments();
+  }
+
+  function renderAppointments() {
+    const list = document.getElementById('appointment-list');
+    const empty = document.getElementById('empty-state');
+
+    if (appointments.length === 0) {
+      list.innerHTML = '';
+      list.appendChild(empty);
+      empty.style.display = 'block';
+      return;
+    }
+
+    // Sort by date
+    appointments.sort((a, b) => new Date(a.date + 'T' + (a.time || '00:00')) - new Date(b.date + 'T' + (b.time || '00:00')));
+
+    list.innerHTML = '';
+    appointments.forEach((appt, index) => {
+      const item = document.createElement('div');
+      item.className = 'appointment-item';
+
+      const dateObj = new Date(appt.date + 'T12:00:00');
+      const dateStr = dateObj.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit', year: 'numeric' });
+      const timeStr = appt.time || '';
+
+      const typeEmoji = {
+        'Consulta': '🩺',
+        'Exame': '🔬',
+        'Quimioterapia': '💊',
+        'Cirurgia': '🏥',
+        'Retorno': '🔄',
+        'Outro': '📌'
+      };
+
+      item.innerHTML = `
+        <div class="appt-info">
+          <div class="appt-title">${typeEmoji[appt.type] || '📌'} ${appt.type}${appt.location ? ' — ' + appt.location : ''}</div>
+          <div class="appt-detail">${appt.notes || 'Sem observações'}</div>
+        </div>
+        <div class="appt-date">${dateStr}${timeStr ? ' às ' + timeStr : ''}</div>
+        <button class="delete-btn" onclick="removeAppointment(${index})" title="Remover">✕</button>
+      `;
+      list.appendChild(item);
+    });
+  }
+
+  function addAppointment() {
+    const type = document.getElementById('appt-type').value;
+    const date = document.getElementById('appt-date').value;
+    const time = document.getElementById('appt-time').value;
+    const location = document.getElementById('appt-location').value;
+    const notes = document.getElementById('appt-notes').value;
+
+    if (!date) {
+      alert('Por favor, selecione uma data.');
+      return;
+    }
+
+    appointments.push({ type, date, time, location, notes });
+    renderAppointments();
+
+    // Clear form
+    document.getElementById('appt-date').value = '';
+    document.getElementById('appt-time').value = '';
+    document.getElementById('appt-location').value = '';
+    document.getElementById('appt-notes').value = '';
+    document.getElementById('appt-type').value = 'Consulta';
+  }
+
+  function removeAppointment(index) {
+    if (confirm('Remover este agendamento?')) {
+      appointments.splice(index, 1);
+      renderAppointments();
+    }
+  }
+
+  loadAppointments();
+</script>
+
+</div><!-- end main-app -->
+
+</body>
+</html>
